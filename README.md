@@ -1,4 +1,4 @@
-# Convert-Vott-to-yolo-format
+# Object-Annotation-Converting
 
 Person collection.
 Some scripts help to convert different object detection datasets formats.
