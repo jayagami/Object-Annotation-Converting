@@ -13,21 +13,21 @@ import argparse
 
 
 class Vott2Yolo:
-    def __init__(self, class_file, vott_dir, dst_dir, image_dir):
+    def __init__(self, class_file_path, vott_dir, dst_dir, image_dir):
         super().__init__()
-        self.custom_path = class_file
+        # self.class_file_path = class_file_path
         self.vott_dir = vott_dir
-        self.save_dir = dst_dir
+        self.dst_dir = dst_dir
         self.image_dir = image_dir
-        self.custom_class_id = self._class_gen()
-        print(self.custom_path)
+        self.custom_class_id = self._class_gen(class_file_path, dst_dir)
+        print(self.class_file_path)
 
-    def _class_gen(self, custom_path="", save_dir=""):
+    @classmethod
+    def _class_gen(cls, class_file_path="", dst_dir=""):
         # gen each class information
-        custom_path = self.custom_path
-        save_path = os.path.join(self.save_dir, "voc_classes.txt")
+        save_path = os.path.join(dst_dir, "voc_classes.txt")
         custom_class = {}
-        with open(custom_path, "r", encoding="utf8") as custom_io:
+        with open(class_file_path, "r", encoding="utf8") as custom_io:
             for line in custom_io.readlines():
                 if line.strip():
                     line = line.strip().split(",")
@@ -74,7 +74,7 @@ class Vott2Yolo:
         return image_info
 
     def train_gen(self, vott_dir="", save_train_path=""):
-        save_train_path = os.path.join(self.save_dir, "train.txt")
+        save_train_path = os.path.join(self.dst_dir, "train.txt")
         train_list = []
         for roots, dirs, files in os.walk(self.vott_dir):
             for f in files:
@@ -88,14 +88,17 @@ class Vott2Yolo:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("c", help="class file of objects")
+    parser.add_argument("c", help="class file")
     parser.add_argument("vott", help="vott project dir")
-    parser.add_argument("dst", help="dir path to save object files")
-    parser.add_argument("imgs", help="path of image dir")
+    parser.add_argument("imgs", help="dir path contains all images")
+    parser.add_argument("dst", help="destination path to save output files")
     args = parser.parse_args()
     print("Starting to convert data\n =========")
     Vott2Yolo(
-        class_file=args.c, vott_dir=args.vott, dst_dir=args.dst, image_dir=args.imgs,
+        class_file_path=args.c,
+        vott_dir=args.vott,
+        image_dir=args.imgs,
+        dst_dir=args.dst,
     ).train_gen()
     print("Job finished!")
 
